@@ -1,0 +1,13 @@
+{
+  "name": "BleedingTea",
+  "version": "0.1.0",
+  "description": "Slick and Simple Logging",
+  "main": "index.js",
+  "keywords": [
+    "logging",
+    "log",
+    "logger"
+  ],
+  "author": "Tomas Longo",
+  "license": "MIT"
+}
