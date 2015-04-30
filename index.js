@@ -46,6 +46,11 @@ module.exports =  {
   }
 }
 
+module.exports.appenders = {
+  FileAppender : require("./appenders/fileappender")
+}
+
+
 if (require.main === module) {
   var FA = new require("./appenders/fileappender.js");
 
