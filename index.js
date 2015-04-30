@@ -47,7 +47,7 @@ module.exports =  {
 }
 
 if (require.main === module) {
-  var FA = new require("./fileappender.js");
+  var FA = new require("./appenders/fileappender.js");
 
   var logger = module.exports;
 
