@@ -1,46 +1,50 @@
+var ConsoleAppender = require("./appenders/consoleappender.js");
+
 module.exports =  {
   active : true,
 
   filler : "\t",
 
-  appenders : [],
+  registeredAppenders : [],
+
+  consoleAppender : new ConsoleAppender(),
 
   info : function(message) {
     if (this.active) {
-      if (this.appenders.length == 0) {
-        console.log("[INFO]" + this.filler + message);
+      if (this.registeredAppenders.length == 0) {
+        this.consoleAppender.write("[INFO]" + this.filler + message + "\n");
       } else {
-        this.goThroughAppenders("[INFO]" + this.filler + message);
+        this.goThroughAppenders("[INFO]" + this.filler + message + "\n");
       }
     }
   },
 
   error : function(message) {
     if (this.active) {
-      if (this.appenders.length == 0) {
-        console.log("[ERROR]" + this.filler + message);
+      if (this.registeredAppenders.length == 0) {
+        this.consoleAppender.write("[ERROR]" + this.filler + message + "\n");
       } else {
-        this.goThroughAppenders("[ERROR]" + this.filler + message);
+        this.goThroughAppenders("[ERROR]" + this.filler + message + "\n");
       }
     }
   },
 
   warning : function(message) {
     if (this.active) {
-      if (this.appenders.length == 0) {
-        console.log("[WARNING]" + this.filler + message);
+      if (this.registeredAppenders.length == 0) {
+        this.consoleAppender.write("[WARNING]" + this.filler + message + "\n");
       } else {
-        this.goThroughAppenders("[WARNING]" + this.filler + message);
+        this.goThroughAppenders("[WARNING]" + this.filler + message + "\n");
       }
     }
   },
 
   addAppender : function(appender) {
-    this.appenders.push(appender);
+    this.registeredAppenders.push(appender);
   },
 
   goThroughAppenders : function(message) {
-    this.appenders.forEach(function(appender) {
+    this.registeredAppenders.forEach(function(appender) {
       appender.write(message);
     });
   }

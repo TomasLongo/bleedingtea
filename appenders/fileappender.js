@@ -9,12 +9,12 @@ module.exports.prototype.initFile = function(file) {
 }
 
 module.exports.prototype.write = function(message) {
-  this.stream.write(message + "\n");
+  this.stream.write(message);
 }
 
 if (require.main === module) {
   function log(appender, message) {
-    appender.write(message + "\n");
+    appender.write(message);
   }
 
   var FA = module.exports;
