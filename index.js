@@ -1,4 +1,5 @@
-var ConsoleAppender = require("./appenders/consoleappender.js");
+var ConsoleAppender = require("./appenders/consoleappender.js"),
+    util = require('util');
 
 module.exports =  {
   active : true,
@@ -11,30 +12,33 @@ module.exports =  {
 
   info : function(message) {
     if (this.active) {
+      var formatted = util.format("%s %s: %s", "[INFO]", new Date().toUTCString(), message);
       if (this.registeredAppenders.length == 0) {
-        this.consoleAppender.write("[INFO]" + this.filler + message + "\n");
+        this.consoleAppender.write(formatted + "\n");
       } else {
-        this.goThroughAppenders("[INFO]" + this.filler + message + "\n");
+        this.goThroughAppenders(formatted + "\n");
       }
     }
   },
 
   error : function(message) {
     if (this.active) {
+      var formatted = util.format("%s %s: %s", "[ERROR]", new Date().toUTCString(), message);
       if (this.registeredAppenders.length == 0) {
-        this.consoleAppender.write("[ERROR]" + this.filler + message + "\n");
+        this.consoleAppender.write(formatted + "\n");
       } else {
-        this.goThroughAppenders("[ERROR]" + this.filler + message + "\n");
+        this.goThroughAppenders(formatted + "\n");
       }
     }
   },
 
   warning : function(message) {
     if (this.active) {
+      var formatted = util.format("%s %s: %s", "[WARNING]", new Date().toUTCString(), message);
       if (this.registeredAppenders.length == 0) {
-        this.consoleAppender.write("[WARNING]" + this.filler + message + "\n");
+        this.consoleAppender.write(formatted + "\n");
       } else {
-        this.goThroughAppenders("[WARNING]" + this.filler + message + "\n");
+        this.goThroughAppenders(formatted + "\n");
       }
     }
   },
@@ -67,4 +71,5 @@ if (require.main === module) {
   logger.addAppender(new FA("foofoo.log"));
 
   logger.error("This should only go to file!!");
+  logger.warning("And this too");
 }
