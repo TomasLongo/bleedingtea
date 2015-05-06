@@ -1,6 +1,9 @@
-var ConsoleAppender = require("./appenders/consoleappender.js");
+var ConsoleAppender = require("./appenders/consoleappender.js"),
+    util = require('util');
 
 module.exports =  {
+  regex : /%[ldm]/g,
+
   active : true,
 
   filler : "\t",
@@ -9,32 +12,51 @@ module.exports =  {
 
   consoleAppender : new ConsoleAppender(),
 
+  messageFormat : "[%l] %d %m",
+
+  _format : function(message, data) {
+    return this.messageFormat.replace(this.regex, function(match) {
+      if (match == "%m") {
+        return data.message;
+      } else if (match == "%d") {
+        return new Date().toISOString();
+      } else if (match == "%l") {
+        return data.level;
+      } else {
+        return "";
+      }
+    });
+  },
+
   info : function(message) {
     if (this.active) {
+      var formatted = this._format(this.messageFormat, {level:"INFO", message:message});
       if (this.registeredAppenders.length == 0) {
-        this.consoleAppender.write("[INFO]" + this.filler + message + "\n");
+        this.consoleAppender.write(formatted + "\n");
       } else {
-        this.goThroughAppenders("[INFO]" + this.filler + message + "\n");
+        this.goThroughAppenders(formatted + "\n");
       }
     }
   },
 
   error : function(message) {
     if (this.active) {
+      var formatted = this._format(this.messageFormat, {level:"ERROR", message:message});
       if (this.registeredAppenders.length == 0) {
-        this.consoleAppender.write("[ERROR]" + this.filler + message + "\n");
+        this.consoleAppender.write(formatted + "\n");
       } else {
-        this.goThroughAppenders("[ERROR]" + this.filler + message + "\n");
+        this.goThroughAppenders(formatted + "\n");
       }
     }
   },
 
   warning : function(message) {
     if (this.active) {
+      var formatted = this._format(this.messageFormat, {level:"WARNING", message:message});
       if (this.registeredAppenders.length == 0) {
-        this.consoleAppender.write("[WARNING]" + this.filler + message + "\n");
+        this.consoleAppender.write(formatted + "\n");
       } else {
-        this.goThroughAppenders("[WARNING]" + this.filler + message + "\n");
+        this.goThroughAppenders(formatted + "\n");
       }
     }
   },
@@ -67,4 +89,5 @@ if (require.main === module) {
   logger.addAppender(new FA("foofoo.log"));
 
   logger.error("This should only go to file!!");
+  logger.warning("And this too");
 }
