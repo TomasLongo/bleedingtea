@@ -16,6 +16,9 @@ var LoggerModule = module.exports = function() {
   this.messageFormat = "[%l] %d %m";
 }
 
+/**
+ * Formats the passed message according to the pattern in `LoggerModule.messageFormat`
+ */
 LoggerModule.prototype._format = function(message, data) {
   return this.messageFormat.replace(this.regex, function(match) {
     if (match == "%m") {
@@ -29,6 +32,19 @@ LoggerModule.prototype._format = function(message, data) {
     }
   });
 };
+
+LoggerModule.createLogFunction = function(logger, logLevel) {
+  return function(message) {
+    if (logger.active) {
+      var formatted = logger._format(logger.messageFormat, {level:logLevel, message:message});
+      if (logger.registeredAppenders.length == 0) {
+        logger.consoleAppender.write(formatted + "\n");
+      } else {
+        logger.goThroughAppenders(formatted + "\n");
+      }
+    }
+  }
+}
 
 LoggerModule.prototype.info = function(message) {
   if (this.active) {
@@ -73,77 +89,6 @@ LoggerModule.prototype.goThroughAppenders = function(message) {
   });
 }
 
-// module.exports =  {
-//   regex : /%[ldm]/g,
-//
-//   active : true,
-//
-//   filler : "\t",
-//
-//   registeredAppenders : [],
-//
-//   consoleAppender : new ConsoleAppender(),
-//
-//   messageFormat : "[%l] %d %m",
-//
-//   _format : function(message, data) {
-//     return this.messageFormat.replace(this.regex, function(match) {
-//       if (match == "%m") {
-//         return data.message;
-//       } else if (match == "%d") {
-//         return new Date().toISOString();
-//       } else if (match == "%l") {
-//         return data.level;
-//       } else {
-//         return "";
-//       }
-//     });
-//   },
-//
-//   info : function(message) {
-//     if (this.active) {
-//       var formatted = this._format(this.messageFormat, {level:"INFO", message:message});
-//       if (this.registeredAppenders.length == 0) {
-//         this.consoleAppender.write(formatted + "\n");
-//       } else {
-//         this.goThroughAppenders(formatted + "\n");
-//       }
-//     }
-//   },
-//
-//   error : function(message) {
-//     if (this.active) {
-//       var formatted = this._format(this.messageFormat, {level:"ERROR", message:message});
-//       if (this.registeredAppenders.length == 0) {
-//         this.consoleAppender.write(formatted + "\n");
-//       } else {
-//         this.goThroughAppenders(formatted + "\n");
-//       }
-//     }
-//   },
-//
-//   warning : function(message) {
-//     if (this.active) {
-//       var formatted = this._format(this.messageFormat, {level:"WARNING", message:message});
-//       if (this.registeredAppenders.length == 0) {
-//         this.consoleAppender.write(formatted + "\n");
-//       } else {
-//         this.goThroughAppenders(formatted + "\n");
-//       }
-//     }
-//   },
-//
-//   addAppender : function(appender) {
-//     this.registeredAppenders.push(appender);
-//   },
-//
-//   goThroughAppenders : function(message) {
-//     this.registeredAppenders.forEach(function(appender) {
-//       appender.write(message);
-//     });
-//   }
-// }
-
 module.exports.appenders = {
   FileAppender : require("./appenders/fileappender")
 }
@@ -165,6 +110,9 @@ if (require.main === module) {
 
   var loggerTwo = new LoggerModule();
   loggerTwo.info("This is from the second logger and should only go to the console");
+
+  loggerTwo.metrics = LoggerModule.createLogFunction(loggerTwo, "METRICS");
+  loggerTwo.metrics("This is a message for metrics on an application");
 
   var loggerThree = new LoggerModule();
   loggerThree.active = false;
